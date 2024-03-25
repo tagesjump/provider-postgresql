@@ -1,0 +1,17 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-postgresql
+  annotations:
+    meta.crossplane.io/maintainer: Tages <provider-yc@tages.ru>
+    meta.crossplane.io/source: github.com/tagesjump/provider-postgresql
+    meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
+      The Postgresql Crossplane provider gives the ability to deploy and configure resources in a PostgreSQL server.
+    meta.crossplane.io/readme: |
+      `provider-postgresql` is the Crossplane provider for [postgresql](https://postgresql.org/).
+
+      ## Report a Bug
+
+      For filing bugs, suggesting improvements, or requesting new features, please
+      open an [issue](https://github.com/tagesjump/provider-postgresql/issues).

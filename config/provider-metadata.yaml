@@ -1,0 +1,734 @@
+name: cyrilgdn/postgresql
+resources:
+    PostgreSQL:
+        subCategory: ""
+        description: A provider for PostgreSQL Server.
+        name: PostgreSQL
+        title: PostgreSQL
+        argumentDocs:
+            aws_rds_iam_auth: |-
+                - (Optional) If set to true, call the AWS RDS API to grab a temporary password, using AWS Credentials
+                from the environment (or the given profile, see aws_rds_iam_profile)
+            aws_rds_iam_profile: '- (Optional) The AWS IAM Profile to use while using AWS RDS IAM Auth.'
+            aws_rds_iam_region: '- (Optional) The AWS region to use while using AWS RDS IAM Auth.'
+            awspostgres: ': Use GoCloud for AWS'
+            azure_identity_auth: '- (Optional) If set to true, call the Azure OAuth token endpoint for temporary token'
+            azure_tenant_id: '- (Optional) (Required if azure_identity_auth is true) Azure tenant ID read more'
+            cert: '- (Required) - The SSL client certificate file path. The file must contain PEM encoded data.'
+            clientcert: '- (Optional) - Configure the SSL client certificate.'
+            connect_timeout: |-
+                - (Optional) Maximum wait for connection, in seconds. The
+                default is 180s.  Zero or not specified means wait indefinitely.
+            database: '- (Optional) Database to connect to. The default is postgres.'
+            database_username: '- (Optional) Username of the user in the database if different than connection username (See user name maps).'
+            expected_version: |-
+                - (Optional) Specify a hint to Terraform regarding the
+                expected version that the provider will be talking with.  This is a required
+                hint in order for Terraform to talk with an ancient version of PostgreSQL.
+                This parameter is expected to be a PostgreSQL
+                Version or current.  Once a
+                connection has been established, Terraform will fingerprint the actual
+                version.  Default: 9.0.0.
+            gcppostgres: ': Use GoCloud for GCP'
+            host: '- (Required) The address for the postgresql server connection, see GoCloud for specific format.'
+            key: '- (Required) - The SSL client certificate private key file path. The file must contain PEM encoded data.'
+            libpq(3): SSL guide
+            max_connections: |-
+                - (Optional) Set the maximum number of open connections to
+                the database. The default is 20.  Zero means unlimited open connections.
+            password: '- (Optional) Password for the server connection.'
+            port: '- (Optional) The port for the postgresql server connection. The default is 5432.'
+            postgres: ': Default value, use lib/pq'
+            scheme: '- (Optional) The driver to use. Valid values are:'
+            sslinline: '- (Optional) - If set to true, arguments accept inline ssl cert and key rather than a filename. Defaults to false.'
+            sslmode: |-
+                - (Optional) Set the priority for an SSL connection to the server.
+                Valid values for sslmode are (note: prefer is not supported by Go's
+                lib/pq)):
+            sslrootcert: '- (Optional) - The SSL server root certificate file path. The file must contain PEM encoded data.'
+            superuser: |-
+                - (Optional) Should be set to false if the user to connect is not a PostgreSQL superuser (as is the case in AWS RDS or GCP SQL).
+                In this case, some features might be disabled (e.g.: Refreshing state password from database).
+            username: '- (Required) Username for the server connection.'
+        importStatements:
+            - |-
+              export PGHOST=localhost
+              export PGPORT=5432
+              export PGUSER=postgres
+              export PGPASSWORD=postgres
+    postgresql_database:
+        subCategory: ""
+        description: Creates and manages a database on a PostgreSQL server.
+        name: postgresql_database
+        title: postgresql_database
+        examples:
+            - name: my_db
+              manifest: |-
+                {
+                  "allow_connections": true,
+                  "connection_limit": -1,
+                  "lc_collate": "C",
+                  "name": "my_db",
+                  "owner": "my_role",
+                  "template": "template0"
+                }
+            - name: db1
+              manifest: |-
+                {
+                  "name": "testdb1",
+                  "provider": "postgresql.admindb"
+                }
+        argumentDocs:
+            allow_connections: |-
+                - (Optional) If false then no one can connect to this
+                database. The default is true, allowing connections (except as restricted by
+                other mechanisms, such as GRANT or REVOKE CONNECT).
+            connection_limit: |-
+                - (Optional) How many concurrent connections can be
+                established to this database. -1 (the default) means no limit.
+            encoding: |-
+                - (Optional) Character set encoding to use in the database.
+                Specify a string constant (e.g. UTF8 or SQL_ASCII), or an integer encoding
+                number.  If unset or set to an empty string the default encoding is set to
+                UTF8.  If set to DEFAULT Terraform will use the same encoding as the
+                template database.  Changing this value will force the creation of a new
+                resource as this value can only be changed when a database is created.
+            is_template: |-
+                - (Optional) If true, then this database can be cloned by any
+                user with CREATEDB privileges; if false (the default), then only
+                superusers or the owner of the database can clone it.
+            lc_collate: |-
+                - (Optional) Collation order (LC_COLLATE) to use in the
+                database.  This affects the sort order applied to strings, e.g. in queries
+                with ORDER BY, as well as the order used in indexes on text columns. If
+                unset or set to an empty string the default collation is set to C.  If set
+                to DEFAULT Terraform will use the same collation order as the specified
+                template database.  Changing this value will force the creation of a new
+                resource as this value can only be changed when a database is created.
+            lc_ctype: |-
+                - (Optional) Character classification (LC_CTYPE) to use in the
+                database. This affects the categorization of characters, e.g. lower, upper and
+                digit. If unset or set to an empty string the default character classification
+                is set to C.  If set to DEFAULT Terraform will use the character
+                classification of the specified template database.  Changing this value will
+                force the creation of a new resource as this value can only be changed when a
+                database is created.
+            name: |-
+                - (Required) The name of the database. Must be unique on the PostgreSQL
+                server instance where it is configured.
+            owner: |-
+                - (Optional) The role name of the user who will own the database, or
+                DEFAULT to use the default (namely, the user executing the command). To
+                create a database owned by another role or to change the owner of an existing
+                database, you must be a direct or indirect member of the specified role, or
+                the username in the provider is a superuser.
+            tablespace_name: |-
+                - (Optional) The name of the tablespace that will be
+                associated with the database, or DEFAULT to use the template database's
+                tablespace.  This tablespace will be the default tablespace used for objects
+                created in this database.
+            template: |-
+                - (Optional) The name of the template database from which to create
+                the database, or DEFAULT to use the default template (template0).  NOTE:
+                the default in Terraform is template0, not template1.  Changing this value
+                will force the creation of a new resource as this value can only be changed
+                when a database is created.
+        importStatements: []
+    postgresql_default_privileges:
+        subCategory: ""
+        description: Creates and manages default privileges given to a user for a database schema.
+        name: postgresql_default_privileges
+        title: postgresql_default_privileges
+        examples:
+            - name: read_only_tables
+              manifest: |-
+                {
+                  "database": "test_db",
+                  "object_type": "table",
+                  "owner": "db_owner",
+                  "privileges": [
+                    "SELECT"
+                  ],
+                  "role": "test_role",
+                  "schema": "public"
+                }
+            - name: revoke_public
+              manifest: |-
+                {
+                  "database": "${postgresql_database.example_db.name}",
+                  "object_type": "function",
+                  "owner": "object_owner",
+                  "privileges": [],
+                  "role": "public"
+                }
+              references:
+                database: postgresql_database.example_db.name
+        argumentDocs:
+            database: '- (Required) The database to grant default privileges for this role.'
+            object_type: '- (Required) The PostgreSQL object type to set the default privileges on (one of: table, sequence, function, type, schema).'
+            owner: '- (Required) Role for which apply default privileges (You can change default privileges only for objects that will be created by yourself or by roles that you are a member of).'
+            privileges: '- (Required) The list of privileges to apply as default privileges. An empty list could be provided to revoke all default privileges for this role.'
+            role: '- (Required) The name of the role to which grant default privileges on.'
+            schema: '- (Optional) The database schema to set default privileges for this role.'
+        importStatements: []
+    postgresql_extension:
+        subCategory: ""
+        description: Creates and manages an extension on a PostgreSQL server.
+        name: postgresql_extension
+        title: postgresql_extension
+        examples:
+            - name: my_extension
+              manifest: |-
+                {
+                  "name": "pg_trgm"
+                }
+        argumentDocs:
+            create_cascade: '- (Optional) When true, will also create any extensions that this extension depends on that are not already installed. (Default: false)'
+            database: '- (Optional) Which database to create the extension on. Defaults to provider database.'
+            drop_cascade: '- (Optional) When true, will also drop all the objects that depend on the extension, and in turn all objects that depend on those objects. (Default: false)'
+            name: '- (Required) The name of the extension.'
+            schema: '- (Optional) Sets the schema of an extension.'
+            version: '- (Optional) Sets the version number of the extension.'
+        importStatements: []
+    postgresql_function:
+        subCategory: ""
+        description: Creates and manages a function on a PostgreSQL server.
+        name: postgresql_function
+        title: postgresql_function
+        examples:
+            - name: increment
+              manifest: |-
+                {
+                  "arg": [
+                    {
+                      "name": "i",
+                      "type": "integer"
+                    }
+                  ],
+                  "body": "BEGIN\n    RETURN i + 1;\nEND;\n",
+                  "language": "plpgsql",
+                  "name": "increment",
+                  "returns": "integer"
+                }
+        argumentDocs:
+            arg: '- (Optional) List of arguments for the function.'
+            body: |-
+                - (Required) Function body.
+                This should be the body content within the AS $$ and the final $$. It will also accept the AS $$ and $$ if added.
+            database: |-
+                - (Optional) The database where the function is located.
+                If not specified, the function is created in the current database.
+            default: '- (Optional) An expression to be used as default value if the parameter is not specified.'
+            drop_cascade: |-
+                - (Optional) True to automatically drop objects that depend on the function (such as
+                operators or triggers), and in turn all objects that depend on those objects. Default is false.
+            language: '- (Optional) The function programming language. Can be one of internal, sql, c, plpgsql. Default is plpgsql.'
+            mode: '- (Optional) Can be one of IN, INOUT, OUT, or VARIADIC. Default is IN.'
+            name: '- (Required) The name of the function.'
+            parallel: '- (Optional) Indicates if the function is parallel safe. Can be one of UNSAFE, RESTRICTED, or SAFE. Default is UNSAFE.'
+            returns: '- (Optional) Type that the function returns. It can be computed from the OUT arguments. Default is void.'
+            schema: |-
+                - (Optional) The schema where the function is located.
+                If not specified, the function is created in the current schema.
+            security_definer: '- (Optional) If the function should execute with the permissions of the owner, rather than the permissions of the caller. Default is false.'
+            strict: '- (Optional) If the function should always return NULL when any of the inputs is NULL. Default is false.'
+            type: '- (Required) The type of the argument.'
+            volatility: '- (Optional) Defines the volatility of the function. Can be one of VOLATILE, STABLE, or IMMUTABLE. Default is VOLATILE.'
+        importStatements: []
+    postgresql_grant:
+        subCategory: ""
+        description: Creates and manages privileges given to a user for a database schema.
+        name: postgresql_grant
+        title: postgresql_grant
+        examples:
+            - name: readonly_tables
+              manifest: |-
+                {
+                  "database": "test_db",
+                  "object_type": "table",
+                  "objects": [
+                    "table1",
+                    "table2"
+                  ],
+                  "privileges": [
+                    "SELECT"
+                  ],
+                  "role": "test_role",
+                  "schema": "public"
+                }
+            - name: read_insert_column
+              manifest: |-
+                {
+                  "columns": [
+                    "col1",
+                    "col2"
+                  ],
+                  "database": "test_db",
+                  "object_type": "column",
+                  "objects": [
+                    "table1"
+                  ],
+                  "privileges": [
+                    "UPDATE",
+                    "INSERT"
+                  ],
+                  "role": "test_role",
+                  "schema": "public"
+                }
+            - name: revoke_public
+              manifest: |-
+                {
+                  "database": "test_db",
+                  "object_type": "schema",
+                  "privileges": [],
+                  "role": "public",
+                  "schema": "public"
+                }
+        argumentDocs:
+            columns: '- (Optional) The columns upon which to grant the privileges. Required when object_type is column. You cannot specify this option if the object_type is not column.'
+            database: '- (Required) The database to grant privileges on for this role.'
+            object_type: '- (Required) The PostgreSQL object type to grant the privileges on (one of: database, schema, table, sequence, function, procedure, routine, foreign_data_wrapper, foreign_server, column).'
+            objects: '- (Optional) The objects upon which to grant the privileges. An empty list (the default) means to grant permissions on all objects of the specified type. You cannot specify this option if the object_type is database or schema. When object_type is column, only one value is allowed.'
+            privileges: '- (Required) The list of privileges to grant. There are different kinds of privileges: SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER, CREATE, CONNECT, TEMPORARY, EXECUTE, and USAGE. An empty list could be provided to revoke all privileges for this role.'
+            role: '- (Required) The name of the role to grant privileges on, Set it to "public" for all roles.'
+            schema: '- The database schema to grant privileges on for this role (Required except if object_type is "database")'
+            with_grant_option: '- (Optional) Whether the recipient of these privileges can grant the same privileges to others. Defaults to false.'
+        importStatements: []
+    postgresql_grant_role:
+        subCategory: ""
+        description: Creates and manages membership in a role to one or more other roles.
+        name: postgresql_grant_role
+        title: postgresql_grant_role
+        examples:
+            - name: grant_root
+              manifest: |-
+                {
+                  "grant_role": "application",
+                  "role": "root",
+                  "with_admin_option": true
+                }
+            - name: bob_admin
+              manifest: |-
+                {
+                  "grant_role": "admin",
+                  "role": "bob"
+                }
+              dependencies:
+                postgresql_role.bob: |-
+                    {
+                      "lifecycle": [
+                        {
+                          "ignore_changes": [
+                            "${roles}"
+                          ]
+                        }
+                      ],
+                      "name": "bob"
+                    }
+        argumentDocs:
+            grant_role: '- (Required) The name of the role that is added to role.'
+            role: '- (Required) The name of the role that is granted a new membership.'
+            with_admin_option: '- (Optional) Giving ability to grant membership to others or not for role. (Default: false)'
+        importStatements: []
+    postgresql_physical_replication_slot:
+        subCategory: ""
+        description: Creates and manages a physical replication slot on a PostgreSQL server.
+        name: postgresql_physical_replication_slot
+        title: postgresql_physical_replication_slot
+        examples:
+            - name: my_slot
+              manifest: |-
+                {
+                  "name": "my_slot"
+                }
+        argumentDocs:
+            name: '- (Required) The name of the replication slot.'
+        importStatements: []
+    postgresql_publication:
+        subCategory: ""
+        description: Creates and manages a publication in a PostgreSQL server database.
+        name: postgresql_publication
+        title: postgresql_publication
+        examples:
+            - name: publication
+              manifest: |-
+                {
+                  "name": "publication",
+                  "tables": [
+                    "public.test",
+                    "another_schema.test"
+                  ]
+                }
+        argumentDocs:
+            all_tables: '- (Optional) Should be ALL TABLES added to the publication. Defaults to ''false'''
+            database: '- (Optional) Which database to create the publication on. Defaults to provider database.'
+            drop_cascade: '- (Optional) Should all subsequent resources of the publication be dropped. Defaults to ''false'''
+            name: '- (Required) The name of the publication.'
+            owner: '- (Optional) Who owns the publication. Defaults to provider user.'
+            publish_param: '- (Optional) Which ''publish'' options should be turned on. Default to ''insert'',''update'',''delete'''
+            publish_via_partition_root_param: '- (Optional) Should be option ''publish_via_partition_root'' be turned on. Default to ''false'''
+            tables: '- (Optional) Which tables add to the publication. By defaults no tables added. Format of table is <schema_name>.<table_name>. If <schema_name> is not specified - default database schema will be used.  Table string must be listed in alphabetical order.'
+        importStatements: []
+    postgresql_replication_slot:
+        subCategory: ""
+        description: Creates and manages a replication slot on a PostgreSQL server.
+        name: postgresql_replication_slot
+        title: postgresql_replication_slot
+        examples:
+            - name: my_slot
+              manifest: |-
+                {
+                  "name": "my_slot",
+                  "plugin": "test_decoding"
+                }
+        argumentDocs:
+            database: '- (Optional) Which database to create the replication slot on. Defaults to provider database.'
+            name: '- (Required) The name of the replication slot.'
+            plugin: '- (Required) Sets the output plugin.'
+        importStatements: []
+    postgresql_role:
+        subCategory: ""
+        description: Creates and manages a role on a PostgreSQL server.
+        name: postgresql_role
+        title: postgresql_role
+        examples:
+            - name: my_role
+              manifest: |-
+                {
+                  "login": true,
+                  "name": "my_role",
+                  "password": "mypass"
+                }
+            - name: my_replication_role
+              manifest: |-
+                {
+                  "connection_limit": 5,
+                  "login": true,
+                  "name": "replication_role",
+                  "password": "md5c98cbfeb6a347a47eb8e96cfb4c4b890",
+                  "replication": true
+                }
+            - name: replication_role
+              manifest: |-
+                {
+                  "name": "replication_name",
+                  "provider": "postgresql.admindb"
+                }
+        argumentDocs:
+            assume_role: '- (Optional) Defines the role to switch to at login via SET ROLE.'
+            bypass_row_level_security: |-
+                - (Optional) Defines whether a role bypasses every
+                row-level security (RLS) policy.  Default value is false.
+            connection_limit: |-
+                - (Optional) If this role can log in, this specifies how
+                many concurrent connections the role can establish. -1 (the default) means no
+                limit.
+            create_database: '- (Optional) Defines a role''s ability to execute CREATE DATABASE.  Default value is false.'
+            create_role: |-
+                - (Optional) Defines a role's ability to execute CREATE ROLE.
+                A role with this privilege can also alter and drop other roles.  Default value
+                is false.
+            encrypted_password: |-
+                - (Optional) Defines whether the password is stored
+                encrypted in the system catalogs.  Default value is true.  NOTE: this value
+                is always set (to the conservative and safe value), but may interfere with the
+                behavior of
+                PostgreSQL's .
+            inherit: |-
+                - (Optional) Defines whether a role "inherits" the privileges of
+                roles it is a member of.  Default value is true.
+            login: |-
+                - (Optional) Defines whether role is allowed to log in.  Roles without
+                this attribute are useful for managing database privileges, but are not users
+                in the usual sense of the word.  Default value is false.
+            name: |-
+                - (Required) The name of the role. Must be unique on the PostgreSQL
+                server instance where it is configured.
+            password: |-
+                - (Optional) Sets the role's password. A password is only of use
+                for roles having the login attribute set to true.
+            password_encryption: setting
+            replication: |-
+                - (Optional) Defines whether a role is allowed to initiate
+                streaming replication or put the system in and out of backup mode.  Default
+                value is false
+            roles: '- (Optional) Defines list of roles which will be granted to this new role.'
+            search_path: |-
+                - (Optional) Alters the search path of this new role. Note that
+                due to limitations in the implementation, values cannot contain the substring
+                ", ".
+            skip_drop_role: |-
+                - (Optional) When a PostgreSQL ROLE exists in multiple
+                databases and the ROLE is dropped, the
+                cleanup of ownership of objects
+                in each of the respective databases must occur before the ROLE can be dropped
+                from the catalog.  Set this option to true when there are multiple databases
+                in a PostgreSQL cluster using the same PostgreSQL ROLE for object ownership.
+                This is the third and final step taken when removing a ROLE from a database.
+            skip_reassign_owned: |-
+                - (Optional) When a PostgreSQL ROLE exists in multiple
+                databases and the ROLE is dropped, a
+                REASSIGN OWNED in
+                must be executed on each of the respective databases before the DROP ROLE
+                can be executed to dropped the ROLE from the catalog.  This is the first and
+                second steps taken when removing a ROLE from a database (the second step being
+                an implicit
+                DROP OWNED).
+            statement_timeout: '- (Optional) Defines statement_timeout setting for this role which allows to abort any statement that takes more than the specified amount of time.'
+            superuser: |-
+                - (Optional) Defines whether the role is a "superuser", and
+                therefore can override all access restrictions within the database.  Default
+                value is false.
+            valid_until: |-
+                - (Optional) Defines the date and time after which the role's
+                password is no longer valid.  Established connections past this valid_time
+                will have to be manually terminated.  This value corresponds to a PostgreSQL
+                datetime. If omitted or the magic value NULL is used, valid_until will be
+                set to infinity.  Default is NULL, therefore infinity.
+        importStatements: []
+    postgresql_schema:
+        subCategory: ""
+        description: Creates and manages a schema within a PostgreSQL database.
+        name: postgresql_schema
+        title: postgresql_schema
+        examples:
+            - name: my_schema
+              manifest: |-
+                {
+                  "name": "my_schema",
+                  "owner": "postgres",
+                  "policy": [
+                    {
+                      "role": "${postgresql_role.app_www.name}",
+                      "usage": true
+                    },
+                    {
+                      "create": true,
+                      "role": "${postgresql_role.app_releng.name}",
+                      "usage": true
+                    },
+                    {
+                      "create_with_grant": true,
+                      "role": "${postgresql_role.app_dba.name}",
+                      "usage_with_grant": true
+                    }
+                  ]
+                }
+              dependencies:
+                postgresql_role.app_dba: |-
+                    {
+                      "name": "app_dba"
+                    }
+                postgresql_role.app_releng: |-
+                    {
+                      "name": "app_releng"
+                    }
+                postgresql_role.app_www: |-
+                    {
+                      "name": "app_www"
+                    }
+            - name: public
+              manifest: |-
+                {
+                  "name": "public"
+                }
+            - name: schema_foo
+              manifest: |-
+                {
+                  "name": "my_schema",
+                  "owner": "postgres",
+                  "policy": [
+                    {
+                      "usage": true
+                    }
+                  ]
+                }
+        argumentDocs:
+            database: '- (Optional) The DATABASE in which where this schema will be created. (Default: The database used by your provider configuration)'
+            drop_cascade: '- (Optional) When true, will also drop all the objects that are contained in the schema. (Default: false)'
+            if_not_exists: '- (Optional) When true, use the existing schema if it exists. (Default: true)'
+            name: |-
+                - (Required) The name of the schema. Must be unique in the PostgreSQL
+                database instance where it is configured.
+            owner: '- (Optional) The ROLE who owns the schema.'
+            policy: |-
+                - (Optional) Can be specified multiple times for each policy.  Each
+                policy block supports fields documented below.
+            policy.create: '- (Optional) Should the specified ROLE have CREATE privileges to the specified SCHEMA.'
+            policy.create_with_grant: '- (Optional) Should the specified ROLE have CREATE privileges to the specified SCHEMA and the ability to GRANT the CREATE privilege to other ROLEs.'
+            policy.role: '- (Optional) The ROLE who is receiving the policy.  If this value is empty or not specified it implies the policy is referring to the PUBLIC role.'
+            policy.usage: '- (Optional) Should the specified ROLE have USAGE privileges to the specified SCHEMA.'
+            policy.usage_with_grant: '- (Optional) Should the specified ROLE have USAGE privileges to the specified SCHEMA and the ability to GRANT the USAGE privilege to other ROLEs.'
+        importStatements: []
+    postgresql_schemas:
+        subCategory: ""
+        description: Retrieves a list of schema names from a PostgreSQL database.
+        name: postgresql_schemas
+        title: postgresql_schemas
+        argumentDocs:
+            database: '- (Required) The PostgreSQL database which will be queried for schema names.'
+            include_system_schemas: '- (Optional) Determines whether to include system schemas (pg_ prefix and information_schema). ''public'' will always be included. Defaults to false.'
+            like_all_patterns: '- (Optional) List of expressions which will be pattern matched in the query using the PostgreSQL LIKE ALL operators.'
+            like_any_patterns: '- (Optional) List of expressions which will be pattern matched in the query using the PostgreSQL LIKE ANY operators.'
+            not_like_all_patterns: '- (Optional) List of expressions which will be pattern matched in the query using the PostgreSQL NOT LIKE ALL operators.'
+            regex_pattern: '- (Optional) Expression which will be pattern matched in the query using the PostgreSQL ~ (regular expression match) operator.'
+            schemas: '- A list of full names of found schemas.'
+        importStatements: []
+    postgresql_sequences:
+        subCategory: ""
+        description: Retrieves a list of sequence names from a PostgreSQL database.
+        name: postgresql_sequences
+        title: postgresql_sequences
+        argumentDocs:
+            database: '- (Required) The PostgreSQL database which will be queried for sequence names.'
+            like_all_patterns: '- (Optional) List of expressions which will be pattern matched against sequence names in the query using the PostgreSQL LIKE ALL operators.'
+            like_any_patterns: '- (Optional) List of expressions which will be pattern matched against sequence names in the query using the PostgreSQL LIKE ANY operators.'
+            not_like_all_patterns: '- (Optional) List of expressions which will be pattern matched against sequence names in the query using the PostgreSQL NOT LIKE ALL operators.'
+            regex_pattern: '- (Optional) Expression which will be pattern matched against sequence names in the query using the PostgreSQL ~ (regular expression match) operator.'
+            schemas: '- (Optional) List of PostgreSQL schema(s) which will be queried for sequence names. Queries all schemas in the database by default.'
+            sequence.data_type: '- The sequence''s data type as defined in information_schema.sequences.'
+            sequence.object_name: '- The sequence name.'
+            sequence.schema_name: '- The parent schema.'
+            sequences: '- A list of PostgreSQL sequences retrieved by this data source. Each sequence consists of the fields documented below.'
+        importStatements: []
+    postgresql_server:
+        subCategory: ""
+        description: Creates and manages a foreign server on a PostgreSQL server.
+        name: postgresql_server
+        title: postgresql_server
+        examples:
+            - name: myserver_postgres
+              manifest: |-
+                {
+                  "depends_on": [
+                    "${postgresql_extension.ext_postgres_fdw}"
+                  ],
+                  "fdw_name": "postgres_fdw",
+                  "options": {
+                    "dbname": "foodb",
+                    "host": "foo",
+                    "port": "5432"
+                  },
+                  "server_name": "myserver_postgres"
+                }
+              dependencies:
+                postgresql_extension.ext_postgres_fdw: |-
+                    {
+                      "name": "postgres_fdw"
+                    }
+            - name: myserver_file
+              manifest: |-
+                {
+                  "depends_on": [
+                    "${postgresql_extension.ext_file_fdw}"
+                  ],
+                  "fdw_name": "file_fdw",
+                  "server_name": "myserver_file"
+                }
+              dependencies:
+                postgresql_extension.ext_file_fdw: |-
+                    {
+                      "name": "file_fdw"
+                    }
+        argumentDocs:
+            drop_cascade: '- (Optional) When true, will drop objects that depend on the server (such as user mappings), and in turn all objects that depend on those objects . (Default: false)'
+            fdw_name: |-
+                - (Required) The name of the foreign-data wrapper that manages the server.
+                Changing this value
+                will force the creation of a new resource as this value can only be set
+                when the foreign server is created.
+            options: '- (Optional) This clause specifies the options for the server. The options typically define the connection details of the server, but the actual names and values are dependent on the server''s foreign-data wrapper.'
+            server_name: '- (Required) The name of the foreign server to be created.'
+            server_owner: '- (Optional) By default, the user who defines the server becomes its owner. Set this value to configure the new owner of the foreign server.'
+            server_type: |-
+                - (Optional) Optional server type, potentially useful to foreign-data wrappers.
+                Changing this value
+                will force the creation of a new resource as this value can only be set
+                when the foreign server is created.
+            server_version: '- (Optional) Optional server version, potentially useful to foreign-data wrappers.'
+        importStatements: []
+    postgresql_susbcription:
+        subCategory: ""
+        description: Creates and manages a subscription in a PostgreSQL server database.
+        name: postgresql_susbcription
+        title: postgresql_susbcription
+        argumentDocs:
+            conninfo: '- (Required) The connection string to the publisher. It should follow the keyword/value format'
+            create_slot: '- (Optional) Specifies whether the command should create the replication slot on the publisher. Default behavior is true'
+            database: '- (Optional) Which database to create the subscription on. Defaults to provider database.'
+            name: '- (Required) The name of the publication.'
+            publications: '- (Required) Names of the publications on the publisher to subscribe to'
+            slot_name: '- (Optional) Name of the replication slot to use. The default behavior is to use the name of the subscription for the slot name'
+        importStatements: []
+    postgresql_tables:
+        subCategory: ""
+        description: Retrieves a list of table names from a PostgreSQL database.
+        name: postgresql_tables
+        title: postgresql_tables
+        argumentDocs:
+            database: '- (Required) The PostgreSQL database which will be queried for table names.'
+            like_all_patterns: '- (Optional) List of expressions which will be pattern matched against table names in the query using the PostgreSQL LIKE ALL operators.'
+            like_any_patterns: '- (Optional) List of expressions which will be pattern matched against table names in the query using the PostgreSQL LIKE ANY operators.'
+            not_like_all_patterns: '- (Optional) List of expressions which will be pattern matched against table names in the query using the PostgreSQL NOT LIKE ALL operators.'
+            regex_pattern: '- (Optional) Expression which will be pattern matched against table names in the query using the PostgreSQL ~ (regular expression match) operator.'
+            schemas: '- (Optional) List of PostgreSQL schema(s) which will be queried for table names. Queries all schemas in the database by default.'
+            table_types: '- (Optional) List of PostgreSQL table types which will be queried for table names. Includes all table types by default (including views and temp tables). Use ''BASE TABLE'' for normal tables only.'
+            tables: '- A list of PostgreSQL tables retrieved by this data source. Each table consists of the fields documented below.'
+            tables.object_name: '- The table name.'
+            tables.schema_name: '- The parent schema.'
+            tables.table_type: '- The table type as defined in information_schema.tables.'
+        importStatements: []
+    postgresql_user_mapping:
+        subCategory: ""
+        description: Creates and manages a user mapping on a PostgreSQL server.
+        name: postgresql_user_mapping
+        title: postgresql_user_mapping
+        examples:
+            - name: remote
+              manifest: |-
+                {
+                  "options": {
+                    "password": "pass",
+                    "user": "admin"
+                  },
+                  "server_name": "${postgresql_server.myserver_postgres.server_name}",
+                  "user_name": "${postgresql_role.remote.name}"
+                }
+              references:
+                server_name: postgresql_server.myserver_postgres.server_name
+                user_name: postgresql_role.remote.name
+              dependencies:
+                postgresql_extension.ext_postgres_fdw: |-
+                    {
+                      "name": "postgres_fdw"
+                    }
+                postgresql_role.remote: |-
+                    {
+                      "name": "remote"
+                    }
+                postgresql_server.myserver_postgres: |-
+                    {
+                      "depends_on": [
+                        "${postgresql_extension.ext_postgres_fdw}"
+                      ],
+                      "fdw_name": "postgres_fdw",
+                      "options": {
+                        "dbname": "foodb",
+                        "host": "foo",
+                        "port": "5432"
+                      },
+                      "server_name": "myserver_postgres"
+                    }
+        argumentDocs:
+            options: '- (Optional) This clause specifies the options of the user mapping. The options typically define the actual user name and password of the mapping. Option names must be unique. The allowed option names and values are specific to the server''s foreign-data wrapper.'
+            server_name: |-
+                - (Required) The name of an existing server for which the user mapping is to be created.
+                Changing this value
+                will force the creation of a new resource as this value can only be set
+                when the user mapping is created.
+            user_name: |-
+                - (Required) The name of an existing user that is mapped to foreign server. CURRENT_ROLE, CURRENT_USER, and USER match the name of the current user. When PUBLIC is specified, a so-called public mapping is created that is used when no user-specific mapping is applicable.
+                Changing this value
+                will force the creation of a new resource as this value can only be set
+                when the user mapping is created.
+        importStatements: []
