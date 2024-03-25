@@ -1,0 +1,19 @@
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Grant
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/grant
+  labels:
+    testing.upbound.io/example-name: readonly_tables
+  name: readonly-tables
+spec:
+  forProvider:
+    database: test_db
+    objectType: table
+    objects:
+    - table1
+    - table2
+    privileges:
+    - SELECT
+    role: test_role
+    schema: public

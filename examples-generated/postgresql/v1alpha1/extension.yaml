@@ -1,0 +1,11 @@
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/extension
+  labels:
+    testing.upbound.io/example-name: my_extension
+  name: my-extension
+spec:
+  forProvider:
+    name: pg_trgm

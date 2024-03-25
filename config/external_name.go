@@ -8,6 +8,20 @@ import (
 // provider.
 var ExternalNameConfigs = map[string]config.ExternalName{
 	// Import requires using a randomly generated ID from provider: nl-2e21sda
+	"postgresql_database":                  config.IdentifierFromProvider,
+	"postgresql_default_privileges":        config.IdentifierFromProvider,
+	"postgresql_extension":                 config.IdentifierFromProvider,
+	"postgresql_function":                  config.IdentifierFromProvider,
+	"postgresql_grant":                     config.IdentifierFromProvider,
+	"postgresql_grant_role":                config.IdentifierFromProvider,
+	"postgresql_physical_replication_slot": config.IdentifierFromProvider,
+	"postgresql_publication":               config.IdentifierFromProvider,
+	"postgresql_replication_slot":          config.IdentifierFromProvider,
+	"postgresql_role":                      config.IdentifierFromProvider,
+	"postgresql_schema":                    config.IdentifierFromProvider,
+	"postgresql_server":                    config.IdentifierFromProvider,
+	"postgresql_subscription":              config.IdentifierFromProvider,
+	"postgresql_user_mapping":              config.IdentifierFromProvider,
 }
 
 // ExternalNameConfigurations applies all external name configs listed in the

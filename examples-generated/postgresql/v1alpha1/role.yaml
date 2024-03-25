@@ -1,0 +1,16 @@
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/role
+  labels:
+    testing.upbound.io/example-name: my_role
+  name: my-role
+spec:
+  forProvider:
+    login: true
+    name: my_role
+    passwordSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system

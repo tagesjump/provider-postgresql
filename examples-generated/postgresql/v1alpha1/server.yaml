@@ -1,0 +1,30 @@
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/server
+  labels:
+    testing.upbound.io/example-name: myserver_postgres
+  name: myserver-postgres
+spec:
+  forProvider:
+    fdwName: postgres_fdw
+    options:
+      dbname: foodb
+      host: foo
+      port: "5432"
+    serverName: myserver_postgres
+
+---
+
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/server
+  labels:
+    testing.upbound.io/example-name: ext_postgres_fdw
+  name: ext-postgres-fdw
+spec:
+  forProvider:
+    name: postgres_fdw

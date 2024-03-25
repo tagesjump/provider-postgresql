@@ -1,0 +1,17 @@
+apiVersion: default.postgresql.upbound.io/v1alpha1
+kind: Privileges
+metadata:
+  annotations:
+    meta.upbound.io/example-id: default/v1alpha1/privileges
+  labels:
+    testing.upbound.io/example-name: read_only_tables
+  name: read-only-tables
+spec:
+  forProvider:
+    database: test_db
+    objectType: table
+    owner: db_owner
+    privileges:
+    - SELECT
+    role: test_role
+    schema: public

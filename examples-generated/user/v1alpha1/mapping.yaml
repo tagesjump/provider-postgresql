@@ -1,0 +1,62 @@
+apiVersion: user.postgresql.upbound.io/v1alpha1
+kind: Mapping
+metadata:
+  annotations:
+    meta.upbound.io/example-id: user/v1alpha1/mapping
+  labels:
+    testing.upbound.io/example-name: remote
+  name: remote
+spec:
+  forProvider:
+    options:
+      password: pass
+      user: admin
+    serverName: ${postgresql_server.myserver_postgres.server_name}
+    userName: my_role
+
+---
+
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    meta.upbound.io/example-id: user/v1alpha1/mapping
+  labels:
+    testing.upbound.io/example-name: ext_postgres_fdw
+  name: ext-postgres-fdw
+spec:
+  forProvider:
+    name: postgres_fdw
+
+---
+
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: user/v1alpha1/mapping
+  labels:
+    testing.upbound.io/example-name: remote
+  name: remote
+spec:
+  forProvider:
+    name: remote
+
+---
+
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Server
+metadata:
+  annotations:
+    meta.upbound.io/example-id: user/v1alpha1/mapping
+  labels:
+    testing.upbound.io/example-name: myserver_postgres
+  name: myserver-postgres
+spec:
+  forProvider:
+    fdwName: postgres_fdw
+    options:
+      dbname: foodb
+      host: foo
+      port: "5432"
+    serverName: myserver_postgres

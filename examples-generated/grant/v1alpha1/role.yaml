@@ -1,0 +1,13 @@
+apiVersion: grant.postgresql.upbound.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: grant/v1alpha1/role
+  labels:
+    testing.upbound.io/example-name: grant_root
+  name: grant-root
+spec:
+  forProvider:
+    grantRole: application
+    role: root
+    withAdminOption: true

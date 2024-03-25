@@ -1,0 +1,63 @@
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Schema
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/schema
+  labels:
+    testing.upbound.io/example-name: my_schema
+  name: my-schema
+spec:
+  forProvider:
+    name: my_schema
+    owner: postgres
+    policy:
+    - role: my_role
+      usage: true
+    - create: true
+      role: my_role
+      usage: true
+    - createWithGrant: true
+      role: my_role
+      usageWithGrant: true
+
+---
+
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/schema
+  labels:
+    testing.upbound.io/example-name: app_dba
+  name: app-dba
+spec:
+  forProvider:
+    name: app_dba
+
+---
+
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/schema
+  labels:
+    testing.upbound.io/example-name: app_releng
+  name: app-releng
+spec:
+  forProvider:
+    name: app_releng
+
+---
+
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/schema
+  labels:
+    testing.upbound.io/example-name: app_www
+  name: app-www
+spec:
+  forProvider:
+    name: app_www

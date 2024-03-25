@@ -1,0 +1,16 @@
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: my_db
+  name: my-db
+spec:
+  forProvider:
+    allowConnections: true
+    connectionLimit: -1
+    lcCollate: C
+    name: my_db
+    owner: my_role
+    template: template0

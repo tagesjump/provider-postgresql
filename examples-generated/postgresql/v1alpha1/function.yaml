@@ -1,0 +1,20 @@
+apiVersion: postgresql.postgresql.upbound.io/v1alpha1
+kind: Function
+metadata:
+  annotations:
+    meta.upbound.io/example-id: postgresql/v1alpha1/function
+  labels:
+    testing.upbound.io/example-name: increment
+  name: increment
+spec:
+  forProvider:
+    arg:
+    - name: i
+      type: integer
+    body: |
+      BEGIN
+          RETURN i + 1;
+      END;
+    language: plpgsql
+    name: increment
+    returns: integer

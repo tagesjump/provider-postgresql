@@ -1,0 +1,733 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  name: roles.postgresql.postgresql.upbound.io
+spec:
+  group: postgresql.postgresql.upbound.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - postgresql
+    kind: Role
+    listKind: RoleList
+    plural: roles
+    singular: role
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Role is the Schema for the Roles API. Creates and manages a role
+          on a PostgreSQL server.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: RoleSpec defines the desired state of Role
+            properties:
+              deletionPolicy:
+                default: Delete
+                description: |-
+                  DeletionPolicy specifies what will happen to the underlying external
+                  when this managed resource is deleted - either "Delete" or "Orphan" the
+                  external resource.
+                  This field is planned to be deprecated in favor of the ManagementPolicies
+                  field in a future release. Currently, both could be set independently and
+                  non-default values would be honored if the feature flag is enabled.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                properties:
+                  assumeRole:
+                    description: |-
+                      Defines the role to switch to at login via SET ROLE.
+                      Role to switch to at login
+                    type: string
+                  bypassRowLevelSecurity:
+                    description: |-
+                      Defines whether a role bypasses every
+                      row-level security (RLS) policy.  Default value is false.
+                      Determine whether a role bypasses every row-level security (RLS) policy
+                    type: boolean
+                  connectionLimit:
+                    description: |-
+                      If this role can log in, this specifies how
+                      many concurrent connections the role can establish. -1 (the default) means no
+                      limit.
+                      How many concurrent connections can be made with this role
+                    type: number
+                  createDatabase:
+                    description: |-
+                      Defines a role's ability to execute CREATE DATABASE.  Default value is false.
+                      Define a role's ability to create databases
+                    type: boolean
+                  createRole:
+                    description: |-
+                      Defines a role's ability to execute CREATE ROLE.
+                      A role with this privilege can also alter and drop other roles.  Default value
+                      is false.
+                      Determine whether this role will be permitted to create new roles
+                    type: boolean
+                  encrypted:
+                    type: string
+                  encryptedPassword:
+                    description: |-
+                      Defines whether the password is stored
+                      encrypted in the system catalogs.  Default value is true.  NOTE: this value
+                      is always set (to the conservative and safe value), but may interfere with the
+                      behavior of
+                      PostgreSQL's .
+                      Control whether the password is stored encrypted in the system catalogs
+                    type: boolean
+                  idleInTransactionSessionTimeout:
+                    description: Terminate any session with an open transaction that
+                      has been idle for longer than the specified duration in milliseconds
+                    type: number
+                  inherit:
+                    description: |-
+                      Defines whether a role "inherits" the privileges of
+                      roles it is a member of.  Default value is true.
+                      Determine whether a role "inherits" the privileges of roles it is a member of
+                    type: boolean
+                  login:
+                    description: |-
+                      Defines whether role is allowed to log in.  Roles without
+                      this attribute are useful for managing database privileges, but are not users
+                      in the usual sense of the word.  Default value is false.
+                      Determine whether a role is allowed to log in
+                    type: boolean
+                  name:
+                    description: |-
+                      The name of the role. Must be unique on the PostgreSQL
+                      server instance where it is configured.
+                      The name of the role
+                    type: string
+                  passwordSecretRef:
+                    description: |-
+                      Sets the role's password. A password is only of use
+                      for roles having the login attribute set to true.
+                      Sets the role's password
+                    properties:
+                      key:
+                        description: The key to select.
+                        type: string
+                      name:
+                        description: Name of the secret.
+                        type: string
+                      namespace:
+                        description: Namespace of the secret.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    - namespace
+                    type: object
+                  replication:
+                    description: |-
+                      Defines whether a role is allowed to initiate
+                      streaming replication or put the system in and out of backup mode.  Default
+                      value is false
+                      Determine whether a role is allowed to initiate streaming replication or put the system in and out of backup mode
+                    type: boolean
+                  roles:
+                    description: |-
+                      Defines list of roles which will be granted to this new role.
+                      Role(s) to grant to this new role
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  searchPath:
+                    description: |-
+                      Alters the search path of this new role. Note that
+                      due to limitations in the implementation, values cannot contain the substring
+                      ", ".
+                      Sets the role's search path
+                    items:
+                      type: string
+                    type: array
+                  skipDropRole:
+                    description: |-
+                      When a PostgreSQL ROLE exists in multiple
+                      databases and the ROLE is dropped, the
+                      cleanup of ownership of objects
+                      in each of the respective databases must occur before the ROLE can be dropped
+                      from the catalog.  Set this option to true when there are multiple databases
+                      in a PostgreSQL cluster using the same PostgreSQL ROLE for object ownership.
+                      This is the third and final step taken when removing a ROLE from a database.
+                      Skip actually running the DROP ROLE command when removing a ROLE from PostgreSQL
+                    type: boolean
+                  skipReassignOwned:
+                    description: |-
+                      When a PostgreSQL ROLE exists in multiple
+                      databases and the ROLE is dropped, a
+                      REASSIGN OWNED in
+                      must be executed on each of the respective databases before the DROP ROLE
+                      can be executed to dropped the ROLE from the catalog.  This is the first and
+                      second steps taken when removing a ROLE from a database (the second step being
+                      an implicit
+                      DROP OWNED).
+                      Skip actually running the REASSIGN OWNED command when removing a role from PostgreSQL
+                    type: boolean
+                  statementTimeout:
+                    description: |-
+                      Defines statement_timeout setting for this role which allows to abort any statement that takes more than the specified amount of time.
+                      Abort any statement that takes more than the specified number of milliseconds
+                    type: number
+                  superuser:
+                    description: |-
+                      Defines whether the role is a "superuser", and
+                      therefore can override all access restrictions within the database.  Default
+                      value is false.
+                      Determine whether the new role is a "superuser"
+                    type: boolean
+                  validUntil:
+                    description: |-
+                      Defines the date and time after which the role's
+                      password is no longer valid.  Established connections past this valid_time
+                      will have to be manually terminated.  This value corresponds to a PostgreSQL
+                      datetime. If omitted or the magic value NULL is used, valid_until will be
+                      set to infinity.  Default is NULL, therefore infinity.
+                      Sets a date and time after which the role's password is no longer valid
+                    type: string
+                type: object
+              initProvider:
+                description: |-
+                  THIS IS A BETA FIELD. It will be honored
+                  unless the Management Policies feature flag is disabled.
+                  InitProvider holds the same fields as ForProvider, with the exception
+                  of Identifier and other resource reference fields. The fields that are
+                  in InitProvider are merged into ForProvider when the resource is created.
+                  The same fields are also added to the terraform ignore_changes hook, to
+                  avoid updating them after creation. This is useful for fields that are
+                  required on creation, but we do not desire to update them after creation,
+                  for example because of an external controller is managing them, like an
+                  autoscaler.
+                properties:
+                  assumeRole:
+                    description: |-
+                      Defines the role to switch to at login via SET ROLE.
+                      Role to switch to at login
+                    type: string
+                  bypassRowLevelSecurity:
+                    description: |-
+                      Defines whether a role bypasses every
+                      row-level security (RLS) policy.  Default value is false.
+                      Determine whether a role bypasses every row-level security (RLS) policy
+                    type: boolean
+                  connectionLimit:
+                    description: |-
+                      If this role can log in, this specifies how
+                      many concurrent connections the role can establish. -1 (the default) means no
+                      limit.
+                      How many concurrent connections can be made with this role
+                    type: number
+                  createDatabase:
+                    description: |-
+                      Defines a role's ability to execute CREATE DATABASE.  Default value is false.
+                      Define a role's ability to create databases
+                    type: boolean
+                  createRole:
+                    description: |-
+                      Defines a role's ability to execute CREATE ROLE.
+                      A role with this privilege can also alter and drop other roles.  Default value
+                      is false.
+                      Determine whether this role will be permitted to create new roles
+                    type: boolean
+                  encrypted:
+                    type: string
+                  encryptedPassword:
+                    description: |-
+                      Defines whether the password is stored
+                      encrypted in the system catalogs.  Default value is true.  NOTE: this value
+                      is always set (to the conservative and safe value), but may interfere with the
+                      behavior of
+                      PostgreSQL's .
+                      Control whether the password is stored encrypted in the system catalogs
+                    type: boolean
+                  idleInTransactionSessionTimeout:
+                    description: Terminate any session with an open transaction that
+                      has been idle for longer than the specified duration in milliseconds
+                    type: number
+                  inherit:
+                    description: |-
+                      Defines whether a role "inherits" the privileges of
+                      roles it is a member of.  Default value is true.
+                      Determine whether a role "inherits" the privileges of roles it is a member of
+                    type: boolean
+                  login:
+                    description: |-
+                      Defines whether role is allowed to log in.  Roles without
+                      this attribute are useful for managing database privileges, but are not users
+                      in the usual sense of the word.  Default value is false.
+                      Determine whether a role is allowed to log in
+                    type: boolean
+                  name:
+                    description: |-
+                      The name of the role. Must be unique on the PostgreSQL
+                      server instance where it is configured.
+                      The name of the role
+                    type: string
+                  replication:
+                    description: |-
+                      Defines whether a role is allowed to initiate
+                      streaming replication or put the system in and out of backup mode.  Default
+                      value is false
+                      Determine whether a role is allowed to initiate streaming replication or put the system in and out of backup mode
+                    type: boolean
+                  roles:
+                    description: |-
+                      Defines list of roles which will be granted to this new role.
+                      Role(s) to grant to this new role
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  searchPath:
+                    description: |-
+                      Alters the search path of this new role. Note that
+                      due to limitations in the implementation, values cannot contain the substring
+                      ", ".
+                      Sets the role's search path
+                    items:
+                      type: string
+                    type: array
+                  skipDropRole:
+                    description: |-
+                      When a PostgreSQL ROLE exists in multiple
+                      databases and the ROLE is dropped, the
+                      cleanup of ownership of objects
+                      in each of the respective databases must occur before the ROLE can be dropped
+                      from the catalog.  Set this option to true when there are multiple databases
+                      in a PostgreSQL cluster using the same PostgreSQL ROLE for object ownership.
+                      This is the third and final step taken when removing a ROLE from a database.
+                      Skip actually running the DROP ROLE command when removing a ROLE from PostgreSQL
+                    type: boolean
+                  skipReassignOwned:
+                    description: |-
+                      When a PostgreSQL ROLE exists in multiple
+                      databases and the ROLE is dropped, a
+                      REASSIGN OWNED in
+                      must be executed on each of the respective databases before the DROP ROLE
+                      can be executed to dropped the ROLE from the catalog.  This is the first and
+                      second steps taken when removing a ROLE from a database (the second step being
+                      an implicit
+                      DROP OWNED).
+                      Skip actually running the REASSIGN OWNED command when removing a role from PostgreSQL
+                    type: boolean
+                  statementTimeout:
+                    description: |-
+                      Defines statement_timeout setting for this role which allows to abort any statement that takes more than the specified amount of time.
+                      Abort any statement that takes more than the specified number of milliseconds
+                    type: number
+                  superuser:
+                    description: |-
+                      Defines whether the role is a "superuser", and
+                      therefore can override all access restrictions within the database.  Default
+                      value is false.
+                      Determine whether the new role is a "superuser"
+                    type: boolean
+                  validUntil:
+                    description: |-
+                      Defines the date and time after which the role's
+                      password is no longer valid.  Established connections past this valid_time
+                      will have to be manually terminated.  This value corresponds to a PostgreSQL
+                      datetime. If omitted or the magic value NULL is used, valid_until will be
+                      set to infinity.  Default is NULL, therefore infinity.
+                      Sets a date and time after which the role's password is no longer valid
+                    type: string
+                type: object
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  This field is planned to replace the DeletionPolicy field in a future
+                  release. Currently, both could be set independently and non-default
+                  values would be honored if the feature flag is enabled. If both are
+                  custom, the DeletionPolicy field will be ignored.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              providerConfigRef:
+                default:
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                  policy:
+                    description: Policies for referencing.
+                    properties:
+                      resolution:
+                        default: Required
+                        description: |-
+                          Resolution specifies whether resolution of this reference is required.
+                          The default is 'Required', which means the reconcile will fail if the
+                          reference cannot be resolved. 'Optional' means this reference will be
+                          a no-op if it cannot be resolved.
+                        enum:
+                        - Required
+                        - Optional
+                        type: string
+                      resolve:
+                        description: |-
+                          Resolve specifies when this reference should be resolved. The default
+                          is 'IfNotPresent', which will attempt to resolve the reference only when
+                          the corresponding field is not present. Use 'Always' to resolve the
+                          reference on every reconcile.
+                        enum:
+                        - Always
+                        - IfNotPresent
+                        type: string
+                    type: object
+                required:
+                - name
+                type: object
+              publishConnectionDetailsTo:
+                description: |-
+                  PublishConnectionDetailsTo specifies the connection secret config which
+                  contains a name, metadata and a reference to secret store config to
+                  which any connection details for this managed resource should be written.
+                  Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  configRef:
+                    default:
+                      name: default
+                    description: |-
+                      SecretStoreConfigRef specifies which secret store config should be used
+                      for this ConnectionSecret.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  metadata:
+                    description: Metadata is the metadata for connection secret.
+                    properties:
+                      annotations:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Annotations are the annotations to be added to connection secret.
+                          - For Kubernetes secrets, this will be used as "metadata.annotations".
+                          - It is up to Secret Store implementation for others store types.
+                        type: object
+                      labels:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Labels are the labels/tags to be added to connection secret.
+                          - For Kubernetes secrets, this will be used as "metadata.labels".
+                          - It is up to Secret Store implementation for others store types.
+                        type: object
+                      type:
+                        description: |-
+                          Type is the SecretType for the connection secret.
+                          - Only valid for Kubernetes Secret Stores.
+                        type: string
+                    type: object
+                  name:
+                    description: Name is the name of the connection secret.
+                    type: string
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                  This field is planned to be replaced in a future release in favor of
+                  PublishConnectionDetailsTo. Currently, both could be set independently
+                  and connection details would be published to both without affecting
+                  each other.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.name is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.name)
+                || (has(self.initProvider) && has(self.initProvider.name))'
+          status:
+            description: RoleStatus defines the observed state of Role.
+            properties:
+              atProvider:
+                properties:
+                  assumeRole:
+                    description: |-
+                      Defines the role to switch to at login via SET ROLE.
+                      Role to switch to at login
+                    type: string
+                  bypassRowLevelSecurity:
+                    description: |-
+                      Defines whether a role bypasses every
+                      row-level security (RLS) policy.  Default value is false.
+                      Determine whether a role bypasses every row-level security (RLS) policy
+                    type: boolean
+                  connectionLimit:
+                    description: |-
+                      If this role can log in, this specifies how
+                      many concurrent connections the role can establish. -1 (the default) means no
+                      limit.
+                      How many concurrent connections can be made with this role
+                    type: number
+                  createDatabase:
+                    description: |-
+                      Defines a role's ability to execute CREATE DATABASE.  Default value is false.
+                      Define a role's ability to create databases
+                    type: boolean
+                  createRole:
+                    description: |-
+                      Defines a role's ability to execute CREATE ROLE.
+                      A role with this privilege can also alter and drop other roles.  Default value
+                      is false.
+                      Determine whether this role will be permitted to create new roles
+                    type: boolean
+                  encrypted:
+                    type: string
+                  encryptedPassword:
+                    description: |-
+                      Defines whether the password is stored
+                      encrypted in the system catalogs.  Default value is true.  NOTE: this value
+                      is always set (to the conservative and safe value), but may interfere with the
+                      behavior of
+                      PostgreSQL's .
+                      Control whether the password is stored encrypted in the system catalogs
+                    type: boolean
+                  id:
+                    type: string
+                  idleInTransactionSessionTimeout:
+                    description: Terminate any session with an open transaction that
+                      has been idle for longer than the specified duration in milliseconds
+                    type: number
+                  inherit:
+                    description: |-
+                      Defines whether a role "inherits" the privileges of
+                      roles it is a member of.  Default value is true.
+                      Determine whether a role "inherits" the privileges of roles it is a member of
+                    type: boolean
+                  login:
+                    description: |-
+                      Defines whether role is allowed to log in.  Roles without
+                      this attribute are useful for managing database privileges, but are not users
+                      in the usual sense of the word.  Default value is false.
+                      Determine whether a role is allowed to log in
+                    type: boolean
+                  name:
+                    description: |-
+                      The name of the role. Must be unique on the PostgreSQL
+                      server instance where it is configured.
+                      The name of the role
+                    type: string
+                  replication:
+                    description: |-
+                      Defines whether a role is allowed to initiate
+                      streaming replication or put the system in and out of backup mode.  Default
+                      value is false
+                      Determine whether a role is allowed to initiate streaming replication or put the system in and out of backup mode
+                    type: boolean
+                  roles:
+                    description: |-
+                      Defines list of roles which will be granted to this new role.
+                      Role(s) to grant to this new role
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
+                  searchPath:
+                    description: |-
+                      Alters the search path of this new role. Note that
+                      due to limitations in the implementation, values cannot contain the substring
+                      ", ".
+                      Sets the role's search path
+                    items:
+                      type: string
+                    type: array
+                  skipDropRole:
+                    description: |-
+                      When a PostgreSQL ROLE exists in multiple
+                      databases and the ROLE is dropped, the
+                      cleanup of ownership of objects
+                      in each of the respective databases must occur before the ROLE can be dropped
+                      from the catalog.  Set this option to true when there are multiple databases
+                      in a PostgreSQL cluster using the same PostgreSQL ROLE for object ownership.
+                      This is the third and final step taken when removing a ROLE from a database.
+                      Skip actually running the DROP ROLE command when removing a ROLE from PostgreSQL
+                    type: boolean
+                  skipReassignOwned:
+                    description: |-
+                      When a PostgreSQL ROLE exists in multiple
+                      databases and the ROLE is dropped, a
+                      REASSIGN OWNED in
+                      must be executed on each of the respective databases before the DROP ROLE
+                      can be executed to dropped the ROLE from the catalog.  This is the first and
+                      second steps taken when removing a ROLE from a database (the second step being
+                      an implicit
+                      DROP OWNED).
+                      Skip actually running the REASSIGN OWNED command when removing a role from PostgreSQL
+                    type: boolean
+                  statementTimeout:
+                    description: |-
+                      Defines statement_timeout setting for this role which allows to abort any statement that takes more than the specified amount of time.
+                      Abort any statement that takes more than the specified number of milliseconds
+                    type: number
+                  superuser:
+                    description: |-
+                      Defines whether the role is a "superuser", and
+                      therefore can override all access restrictions within the database.  Default
+                      value is false.
+                      Determine whether the new role is a "superuser"
+                    type: boolean
+                  validUntil:
+                    description: |-
+                      Defines the date and time after which the role's
+                      password is no longer valid.  Established connections past this valid_time
+                      will have to be manually terminated.  This value corresponds to a PostgreSQL
+                      datetime. If omitted or the magic value NULL is used, valid_until will be
+                      set to infinity.  Default is NULL, therefore infinity.
+                      Sets a date and time after which the role's password is no longer valid
+                    type: string
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

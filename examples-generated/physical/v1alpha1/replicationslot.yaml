@@ -1,0 +1,11 @@
+apiVersion: physical.postgresql.upbound.io/v1alpha1
+kind: ReplicationSlot
+metadata:
+  annotations:
+    meta.upbound.io/example-id: physical/v1alpha1/replicationslot
+  labels:
+    testing.upbound.io/example-name: my_slot
+  name: my-slot
+spec:
+  forProvider:
+    name: my_slot
